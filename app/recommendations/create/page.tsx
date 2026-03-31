@@ -37,7 +37,7 @@ export default function CreateRecommendationPage() {
     setSubmitting(true);
     try {
       const rec = await create({ 과자이름: form.과자이름.trim(), 주문이유: form.주문이유.trim() });
-      router.push(`/recommendations/${rec.주문_id}`);
+      router.push(`/`);
     } catch (err: any) {
       setError(err?.message ?? "추천글 작성에 실패했습니다.");
       setSubmitting(false);

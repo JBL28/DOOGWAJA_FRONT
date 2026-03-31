@@ -1,15 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import Pagination from "@/components/common/Pagination";
 import RecommendationCard from "@/components/recommendations/RecommendationCard";
 import BoughtSnackCard from "@/components/bought-snacks/BoughtSnackCard";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { useBoughtSnacks } from "@/hooks/useBoughtSnacks";
+import { useUserStore } from "@/lib/store/userStore";
 import type { Recommendation } from "@/types/api";
 
 export default function HomePage() {
+  const { role } = useUserStore();
+  const isAdmin = role === 'admin';
+  const router = useRouter();
+
   const {
     recommendations,
     totalPages: recTotalPages,
@@ -94,7 +101,34 @@ export default function HomePage() {
               }}
             >
               <h2 className="section-title">🛒 구매한 과자</h2>
-              {snackLoading && <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      console.log("새 과자 추가 버튼 클릭됨");
+                      if (typeof window !== "undefined") {
+                        window.location.href = "/bought-snacks/create";
+                      }
+                    }}
+                    style={{
+                      background: "#FF6B35",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 16px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.background = "#E55A2B")}
+                    onMouseOut={(e) => (e.currentTarget.style.background = "#FF6B35")}
+                  >
+                    + 새 과자 추가
+                  </button>
+                )}
+                {snackLoading && <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />}
+              </div>
             </div>
 
             {snacks.length === 0 && !snackLoading ? (

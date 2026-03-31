@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { apiPost, apiDelete } from "@/lib/axios/helpers";
 import requests from "@/lib/axios/request";
 import { useUserStore } from "@/lib/store/userStore";
@@ -23,6 +23,8 @@ export function useFeedback({
   initialMyFeedback = null,
 }: UseFeedbackOptions) {
   const { user_id } = useUserStore();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
   const [myFeedback, setMyFeedback] = useState<FeedbackType | null>(
@@ -126,6 +128,6 @@ export function useFeedback({
     handleDislike,
     handleUnlike,
     handleUndislike,
-    isLoggedIn: !!user_id,
+    isLoggedIn: mounted && !!user_id,
   };
 }

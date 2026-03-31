@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import Header from "@/components/common/Header";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { useUserStore } from "@/lib/store/userStore";
-import Link from "next/link";
 
 export default function EditRecommendationPage() {
   const params = useParams();
@@ -19,6 +19,7 @@ export default function EditRecommendationPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (user_id === null) return; // 아직 Zustand 하이드레이션 전 - 대기
     getDetail(주문_id)
       .then((rec) => {
         if (user_id !== rec.사용자Id) { router.push(`/recommendations/${주문_id}`); return; }
@@ -26,7 +27,7 @@ export default function EditRecommendationPage() {
       })
       .catch(() => router.push("/"))
       .finally(() => setLoading(false));
-  }, [주문_id]);
+  }, [주문_id, user_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

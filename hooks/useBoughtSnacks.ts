@@ -10,6 +10,8 @@ import type {
   BoughtSnackCommentListResponse,
   BoughtSnackStatus,
   CreateBoughtSnackCommentRequest,
+  CreateBoughtSnackRequest,
+  UpdateBoughtSnackRequest,
 } from "@/types/api";
 
 export function useBoughtSnacks() {
@@ -42,7 +44,28 @@ export function useBoughtSnacks() {
     await apiPut(requests.boughtSnackStatus.update(구매_id), { 상태 });
   };
 
-  return { snacks, total, totalPages, loading, fetchList, getDetail, updateStatus };
+  const createBoughtSnack = async (data: CreateBoughtSnackRequest): Promise<BoughtSnack> => {
+    const newSnack = await apiPost<BoughtSnack>(requests.boughtSnacks.create, data);
+    // 목록 갱신 (선택적)
+    await fetchList(1, snacks.length + 1);
+    return newSnack;
+  };
+
+  const updateBoughtSnack = async (구매_id: string, data: UpdateBoughtSnackRequest): Promise<BoughtSnack> => {
+    const updatedSnack = await apiPut<BoughtSnack>(requests.boughtSnacks.update(구매_id), data);
+    // 목록 갱신
+    setSnacks(prev => prev.map(snack => snack.구매_id === Number(구매_id) ? updatedSnack : snack));
+    return updatedSnack;
+  };
+
+  const deleteBoughtSnack = async (구매_id: string): Promise<void> => {
+    await apiDelete(requests.boughtSnacks.delete(구매_id));
+    // 목록에서 제거
+    setSnacks(prev => prev.filter(snack => snack.구매_id !== Number(구매_id)));
+    setTotal(prev => prev - 1);
+  };
+
+  return { snacks, total, totalPages, loading, fetchList, getDetail, updateStatus, createBoughtSnack, updateBoughtSnack, deleteBoughtSnack };
 }
 
 export function useBoughtSnackComments(구매_id: string) {

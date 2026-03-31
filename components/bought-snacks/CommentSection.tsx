@@ -59,7 +59,8 @@ export default function BoughtSnackCommentSection({
             key={c.Key}
             comment={c}
             구매_id={구매_id}
-            isAuthor={user_id === c.사용자Id}
+            // NOTE: user_id(number|null) vs c.사용자Id(number) → String() 변환으로 타입 불일치 방어
+            isAuthor={user_id != null && String(user_id) === String(c.사용자Id)}
             onUpdate={onUpdate}
             onDelete={onDelete}
           />
@@ -136,6 +137,8 @@ function BSCommentItem({
     try {
       await onUpdate(String(comment.Key), editContent.trim());
       setEditing(false);
+    } catch {
+      alert("갱신에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setSaving(false);
     }
@@ -182,7 +185,14 @@ function BSCommentItem({
           {isAuthor && !editing && (
             <div style={{ display: "flex", gap: 4 }}>
               <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}>수정</button>
-              <button className="btn btn-danger btn-sm" onClick={() => onDelete(String(comment.Key))}>삭제</button>
+              <button className="btn btn-danger btn-sm" onClick={async () => {
+                if (!confirm("이 댓글을 삭제할까요?")) return;
+                try {
+                  await onDelete(String(comment.Key));
+                } catch {
+                  alert("댓글 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+                }
+              }}>삭제</button>
             </div>
           )}
         </div>

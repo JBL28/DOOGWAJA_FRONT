@@ -60,7 +60,8 @@ export default function RecommendationCommentSection({
             key={comment.댓글_id}
             comment={comment}
             주문_id={주문_id}
-            isAuthor={user_id === comment.사용자Id}
+            // NOTE: user_id(number|null) vs comment.사용자Id(number) → String() 변환으로 타입 불일치 방어
+            isAuthor={user_id != null && String(user_id) === String(comment.사용자Id)}
             onUpdate={onUpdate}
             onDelete={onDelete}
           />
@@ -140,7 +141,9 @@ function CommentItem({
     try {
       await onUpdate(String(comment.댓글_id), editContent.trim());
       setEditing(false);
-    } catch { /* pass */ } finally {
+    } catch {
+      alert("수정에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
       setSaving(false);
     }
   };
@@ -195,7 +198,14 @@ function CommentItem({
               <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}>수정</button>
               <button
                 className="btn btn-danger btn-sm"
-                onClick={() => onDelete(String(comment.댓글_id))}
+                onClick={async () => {
+                  if (!confirm("이 댓글을 삭제할까요?")) return;
+                  try {
+                    await onDelete(String(comment.댓글_id));
+                  } catch {
+                    alert("댓글 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+                  }
+                }}
               >
                 삭제
               </button>

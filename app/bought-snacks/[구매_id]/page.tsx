@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import FeedbackButtons from "@/components/common/FeedbackButtons";
 import BoughtSnackCommentSection from "@/components/bought-snacks/CommentSection";
@@ -24,6 +25,7 @@ export default function BoughtSnackDetailPage() {
   const { comments, loading: cLoading, fetchComments, addComment, updateComment, removeComment } =
     useBoughtSnackComments(구매_id);
   const { user_id } = useUserStore();
+  const router = useRouter();
 
   const [snack, setSnack] = useState<BoughtSnack | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,9 +69,12 @@ export default function BoughtSnackDetailPage() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Header />
       <main className="page-wrapper" style={{ flex: 1, maxWidth: 760 }}>
-        <Link href="/" style={{ color: "var(--color-candy-orange)", fontWeight: 700, fontSize: "0.88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 20 }}>
+        <button
+          onClick={() => router.push("/")}
+          style={{ color: "var(--color-candy-orange)", fontWeight: 700, fontSize: "0.88rem", background: "none", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 20 }}
+        >
           ← 목록으로
-        </Link>
+        </button>
 
         {/* 과자 상세 */}
         <div className="card fade-in" style={{ marginBottom: 24, borderLeft: "4px solid var(--color-candy-yellow)" }}>

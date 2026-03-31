@@ -18,8 +18,26 @@
  */
 
 import api from "./axios";
-import { ApiResponse } from "@/types/axios/apiRes";
 import { HttpError } from "@/types/axios/httpError";
+
+/**
+ * axios 응답 인터셉터가 반환하는 형태가 케이스별로 달라질 수 있어
+ * (AxiosResponse vs 인터셉터가 반환한 data) 여기서 안전하게 정규화합니다.
+ *
+ * backend: { success: true, data: <실데이터>, message: ... }
+ * -> 최종적으로 <실데이터>만 반환
+ */
+const unwrapApiResponseData = (result: any) => {
+  if (
+    result &&
+    typeof result === "object" &&
+    "success" in result &&
+    "data" in result
+  ) {
+    return result.data;
+  }
+  return result;
+};
 
 /**
  * 타입 안전한 API GET 요청
@@ -33,8 +51,8 @@ export const apiGet = async <T = unknown>(
   config?: any
 ): Promise<T> => {
   try {
-    const response = await api.get<ApiResponse<T>>(url, config);
-    return response.data as T;
+    const result = await api.get(url, config);
+    return unwrapApiResponseData(result) as T;
   } catch (error) {
     throw error;
   }
@@ -54,8 +72,8 @@ export const apiPost = async <T = unknown>(
   config?: any
 ): Promise<T> => {
   try {
-    const response = await api.post<ApiResponse<T>>(url, data, config);
-    return response.data as T;
+    const result = await api.post(url, data, config);
+    return unwrapApiResponseData(result) as T;
   } catch (error) {
     throw error;
   }
@@ -75,8 +93,8 @@ export const apiPut = async <T = unknown>(
   config?: any
 ): Promise<T> => {
   try {
-    const response = await api.put<ApiResponse<T>>(url, data, config);
-    return response.data as T;
+    const result = await api.put(url, data, config);
+    return unwrapApiResponseData(result) as T;
   } catch (error) {
     throw error;
   }
@@ -94,8 +112,8 @@ export const apiDelete = async <T = unknown>(
   config?: any
 ): Promise<T> => {
   try {
-    const response = await api.delete<ApiResponse<T>>(url, config);
-    return response.data as T;
+    const result = await api.delete(url, config);
+    return unwrapApiResponseData(result) as T;
   } catch (error) {
     throw error;
   }
@@ -115,8 +133,8 @@ export const apiPatch = async <T = unknown>(
   config?: any
 ): Promise<T> => {
   try {
-    const response = await api.patch<ApiResponse<T>>(url, data, config);
-    return response.data as T;
+    const result = await api.patch(url, data, config);
+    return unwrapApiResponseData(result) as T;
   } catch (error) {
     throw error;
   }

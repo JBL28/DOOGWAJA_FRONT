@@ -49,10 +49,19 @@ describe("RecommendationCard 컴포넌트", () => {
       expect(screen.getByText(/바삭하고 짭짤해서/)).toBeInTheDocument();
     });
 
-    it("'보기 →' 링크가 올바른 href를 가진다", () => {
+    it("'보기 →' 버튼이 올바른 경로로 이동한다", () => {
+      const mockLocation = vi.fn();
+      Object.defineProperty(window, 'location', {
+        value: { href: '' },
+        writable: true,
+      });
+      const originalLocation = window.location;
+      window.location.href = '';
+
       render(<RecommendationCard rec={REC} />);
-      const viewLink = screen.getByRole("link", { name: /보기/ });
-      expect(viewLink).toHaveAttribute("href", `/recommendations/${REC.주문_id}`);
+      const viewButton = screen.getByRole("button", { name: /보기/ });
+      userEvent.click(viewButton);
+      expect(window.location.href).toBe(`/recommendations/${REC.주문_id}`);
     });
   });
 
@@ -62,7 +71,7 @@ describe("RecommendationCard 컴포넌트", () => {
       setLoggedInUser({ user_id: 1 }); // 작성자와 동일
       render(<RecommendationCard rec={REC} />);
 
-      expect(screen.getByRole("link", { name: "수정" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "수정" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "삭제" })).toBeInTheDocument();
     });
 
@@ -70,7 +79,7 @@ describe("RecommendationCard 컴포넌트", () => {
       setLoggedInUser({ user_id: 99 }); // 작성자(1)와 다른 사용자
       render(<RecommendationCard rec={REC} />);
 
-      expect(screen.queryByRole("link", { name: "수정" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "수정" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "삭제" })).not.toBeInTheDocument();
     });
 
@@ -78,7 +87,9 @@ describe("RecommendationCard 컴포넌트", () => {
       // user_id=null (setup.ts 초기화)
       render(<RecommendationCard rec={REC} />);
 
+      expect(screen.queryByRole("button", { name: "수정" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "삭제" })).not.toBeInTheDocument();
+    });
     });
   });
 
@@ -134,11 +145,18 @@ describe("RecommendationCard 컴포넌트", () => {
     });
   });
 
-  // ── 수정 링크 ──
-  it("수정 링크가 올바른 편집 경로를 가진다", () => {
+  // ── 수정 버튼 ──
+  it("수정 버튼이 올바른 편집 경로로 이동한다", () => {
     setLoggedInUser({ user_id: 1 });
+    Object.defineProperty(window, 'location', {
+      value: { href: '' },
+      writable: true,
+    });
+    window.location.href = '';
+
     render(<RecommendationCard rec={REC} />);
-    const editLink = screen.getByRole("link", { name: "수정" });
-    expect(editLink).toHaveAttribute("href", `/recommendations/${REC.주문_id}/edit`);
+    const editButton = screen.getByRole("button", { name: "수정" });
+    userEvent.click(editButton);
+    expect(window.location.href).toBe(`/recommendations/${REC.주문_id}/edit`);
   });
 });

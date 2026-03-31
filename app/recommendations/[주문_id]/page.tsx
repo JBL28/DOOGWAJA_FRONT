@@ -17,7 +17,7 @@ export default function RecommendationDetailPage() {
   const { getDetail, remove } = useRecommendations();
   const { comments, loading: cLoading, fetchComments, addComment, updateComment, removeComment } =
     useRecommendationComments(주문_id);
-  const { user_id } = useUserStore();
+  const { user_id, _hasHydrated } = useUserStore();
 
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,10 +42,17 @@ export default function RecommendationDetailPage() {
     } catch { setDeleting(false); }
   };
 
-  if (loading) return <LoadingPage />;
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header />
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="spinner" />
+      </div>
+    </div>
+  );
   if (!rec) return null;
 
-  const isAuthor = user_id === rec.사용자Id;
+  const isAuthor = _hasHydrated && user_id === rec.사용자Id;
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -86,7 +93,12 @@ export default function RecommendationDetailPage() {
             </div>
             {isAuthor && (
               <div style={{ display: "flex", gap: 8 }}>
-                <Link href={`/recommendations/${주문_id}/edit`} className="btn btn-ghost btn-sm">수정</Link>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => router.push(`/recommendations/${주문_id}/edit`)}
+                >
+                  수정
+                </button>
                 <button className="btn btn-danger btn-sm" onClick={handleDelete} disabled={deleting}>삭제</button>
               </div>
             )}
