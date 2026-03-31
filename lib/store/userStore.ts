@@ -12,10 +12,11 @@ import { persist, createJSONStorage } from "zustand/middleware";
 interface UserState {
   user_id: number | null;
   nickname: string;
+  role?: 'admin' | 'user';
   bio?: string;
   profileImage?: string;
-  setUser: (user_id: number, nickname: string, bio?: string, profileImage?: string) => void;
-  updateUser: (nickname?: string, bio?: string, profileImage?: string) => void;
+  setUser: (user_id: number, nickname: string, role?: 'admin' | 'user', bio?: string, profileImage?: string) => void;
+  updateUser: (nickname?: string, role?: 'admin' | 'user', bio?: string, profileImage?: string) => void;
   clearUser: () => void;
 }
 
@@ -33,26 +34,30 @@ export const useUserStore = create<UserState>()(
       user_id: null,
       /** 사용자 닉네임 (ERD: nickname) */
       nickname: "",
+      /** 사용자 역할 */
+      role: undefined,
       /** 사용자 소개 */
       bio: undefined,
       /** 프로필 이미지 */
       profileImage: undefined,
       
       clearUser: () => {
-        set({ user_id: null, nickname: "", bio: undefined, profileImage: undefined });
+        set({ user_id: null, nickname: "", role: undefined, bio: undefined, profileImage: undefined });
       },
 
       /**
        * 사용자 정보를 통합 설정합니다.
        * @param {number} user_id - 사용자 ID (ERD: user_id)
        * @param {string} nickname - 사용자 닉네임 (ERD: nickname)
+       * @param {'admin' | 'user'} [role] - 사용자 역할
        * @param {string} [bio] - 사용자 소개
        * @param {string} [profileImage] - 프로필 이미지 URL
        */
-      setUser: (user_id, nickname, bio, profileImage) =>
+      setUser: (user_id, nickname, role, bio, profileImage) =>
         set({
           user_id,
           nickname,
+          role,
           bio,
           profileImage,
         }),
@@ -60,12 +65,14 @@ export const useUserStore = create<UserState>()(
       /**
        * 사용자 정보를 개별적으로 변경합니다.
        * @param {string} [nickname] - 사용자 닉네임
+       * @param {'admin' | 'user'} [role] - 사용자 역할
        * @param {string} [bio] - 사용자 소개
        * @param {string} [profileImage] - 프로필 이미지 URL
        */
-      updateUser: (nickname, bio, profileImage) => 
+      updateUser: (nickname, role, bio, profileImage) => 
         set((state) => ({
           nickname: nickname ?? state.nickname,
+          role: role !== undefined ? role : state.role,
           bio: bio !== undefined ? bio : state.bio,
           profileImage: profileImage !== undefined ? profileImage : state.profileImage,
         })),
