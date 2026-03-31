@@ -1,26 +1,325 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   두과자(DOGWAJA) 디자인 시스템 — 과자 테마 🍪
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 🎨 색상 팔레트 */
+  --color-candy-orange: #FF6B35;
+  --color-candy-yellow: #FFD166;
+  --color-candy-cream: #FFF8F0;
+  --color-candy-peach: #FFAB76;
+  --color-candy-pink: #FF8FA3;
+  --color-candy-mint: #06D6A0;
+  --color-candy-brown: #8B4513;
+  --color-candy-dark: #3D1A00;
+  --color-candy-light: #FFFDF9;
+
+  /* 🍫 표면 색상 */
+  --bg-primary: #FFF8F0;
+  --bg-card: #FFFFFF;
+  --bg-header: #FF6B35;
+
+  /* 📝 텍스트 */
+  --text-primary: #3D1A00;
+  --text-secondary: #8B6348;
+  --text-muted: #B89880;
+  --text-inverse: #FFFFFF;
+
+  /* 🔲 테두리 */
+  --border-color: #F0D8C0;
+  --border-focus: #FF6B35;
+
+  /* 📐 그림자 */
+  --shadow-card: 0 2px 12px rgba(255, 107, 53, 0.12);
+  --shadow-card-hover: 0 6px 24px rgba(255, 107, 53, 0.22);
+  --shadow-btn: 0 3px 0 rgba(139, 69, 19, 0.4);
+  --shadow-btn-active: 0 1px 0 rgba(139, 69, 19, 0.4);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ============ 기본 리셋 ============ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Sans KR', 'Nunito', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  /* 과자 포장지 느낌의 반점 패턴 */
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 209, 102, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 107, 53, 0.06) 0%, transparent 50%);
 }
+
+/* ============ 공통 버튼 ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--color-candy-orange);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+}
+.btn-primary:hover {
+  background: #e85a26;
+  box-shadow: var(--shadow-btn-hover);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-btn-active);
+}
+
+.btn-secondary {
+  background: var(--color-candy-yellow);
+  color: var(--color-candy-dark);
+  box-shadow: 0 3px 0 rgba(180,120,0,0.3);
+}
+.btn-secondary:hover {
+  background: #ffc233;
+  transform: translateY(-1px);
+}
+.btn-secondary:active {
+  transform: translateY(1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-candy-orange);
+  border: 2px solid var(--color-candy-orange);
+}
+.btn-ghost:hover {
+  background: rgba(255,107,53,0.08);
+}
+
+.btn-danger {
+  background: #FF4455;
+  color: #fff;
+  box-shadow: 0 3px 0 rgba(180,0,30,0.3);
+}
+.btn-danger:hover {
+  background: #e03344;
+  transform: translateY(-1px);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ============ 카드 ============ */
+.card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  border: 1.5px solid var(--border-color);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ============ 인풋 ============ */
+.input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ============ 뱃지/태그 ============ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.badge-orange { background: rgba(255,107,53,0.12); color: var(--color-candy-orange); }
+.badge-yellow { background: rgba(255,209,102,0.25); color: #8B6000; }
+.badge-green  { background: rgba(6,214,160,0.12); color: #057A59; }
+.badge-red    { background: rgba(255,68,85,0.12); color: #CC2233; }
+.badge-gray   { background: rgba(180,150,130,0.15); color: var(--text-secondary); }
+
+/* ============ 상태 뱃지 ============ */
+.status-배송중   { background: rgba(255,171,118,0.2); color: #CC5500; }
+.status-재고있음 { background: rgba(6,214,160,0.15); color: #057A59; }
+.status-재고없음 { background: rgba(200,200,200,0.3); color: #777; }
+
+/* ============ 구분선 ============ */
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 16px 0;
+}
+
+/* ============ 로딩 스피너 ============ */
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-candy-orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============ 에러 메시지 ============ */
+.error-msg {
+  color: #CC2233;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ============ 섹션 제목 ============ */
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============ 빈 상태 ============ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.empty-state .empty-icon {
+  font-size: 3rem;
+  opacity: 0.6;
+}
+
+/* ============ 페이지 래퍼 ============ */
+.page-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 24px;
+}
+
+/* ============ 스크롤바 커스텀 ============ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-candy-peach); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-candy-orange); }
+
+/* ============ 피드백 버튼 ============ */
+.feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-color);
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+}
+.feedback-btn:hover {
+  border-color: var(--color-candy-orange);
+  color: var(--color-candy-orange);
+  background: rgba(255,107,53,0.05);
+}
+.feedback-btn.active-like {
+  background: rgba(255,107,53,0.12);
+  border-color: var(--color-candy-orange);
+  color: var(--color-candy-orange);
+}
+.feedback-btn.active-dislike {
+  background: rgba(255,68,85,0.1);
+  border-color: #FF4455;
+  color: #FF4455;
+}
+
+/* ============ 댓글 영역 ============ */
+.comment-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.comment-item:last-child { border-bottom: none; }
+
+/* ============ 토스트/알림 ============ */
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.toast {
+  animation: slideIn 0.25s ease;
+}
+
+/* ============ 애니메이션 ============ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.25s ease; }
+
+@keyframes jelly {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  60% { transform: scale(0.95); }
+}
+.jelly { animation: jelly 0.35s ease; }

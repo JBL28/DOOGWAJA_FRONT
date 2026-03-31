@@ -1,65 +1,171 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import Header from "@/components/common/Header";
+import Pagination from "@/components/common/Pagination";
+import RecommendationCard from "@/components/recommendations/RecommendationCard";
+import BoughtSnackCard from "@/components/bought-snacks/BoughtSnackCard";
+import { useRecommendations } from "@/hooks/useRecommendations";
+import { useBoughtSnacks } from "@/hooks/useBoughtSnacks";
+import type { Recommendation } from "@/types/api";
+
+export default function HomePage() {
+  const {
+    recommendations,
+    totalPages: recTotalPages,
+    loading: recLoading,
+    fetchList: fetchRecs,
+  } = useRecommendations();
+
+  const {
+    snacks,
+    totalPages: snackTotalPages,
+    loading: snackLoading,
+    fetchList: fetchSnacks,
+  } = useBoughtSnacks();
+
+  const [recPage, setRecPage] = useState(1);
+  const [snackPage, setSnackPage] = useState(1);
+  const [recList, setRecList] = useState<Recommendation[]>([]);
+
+  useEffect(() => {
+    fetchRecs(recPage, 10);
+  }, [recPage]);
+
+  useEffect(() => {
+    fetchSnacks(snackPage, 10);
+  }, [snackPage]);
+
+  useEffect(() => {
+    setRecList(recommendations);
+  }, [recommendations]);
+
+  const handleRecDeleted = (id: number) => {
+    setRecList((prev) => prev.filter((r) => r.주문_id !== id));
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header />
+
+      <main className="page-wrapper" style={{ flex: 1, paddingTop: 32 }}>
+        {/* 히어로 배너 */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #FF6B35 0%, #FFD166 100%)",
+            borderRadius: 24,
+            padding: "32px 36px",
+            marginBottom: 36,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxShadow: "0 8px 32px rgba(255,107,53,0.25)",
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontWeight: 900,
+                fontSize: "2rem",
+                color: "#fff",
+                letterSpacing: "-1px",
+                marginBottom: 8,
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              🍪 두과자
+            </h1>
+            <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1rem", fontWeight: 600 }}>
+              반 구성원들과 과자 취향을 공유해요!
+            </p>
+          </div>
+          <div style={{ fontSize: 64, opacity: 0.8 }}>🛒</div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* 2컬럼 레이아웃 */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
+          {/* 구매한 과자 */}
+          <section>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <h2 className="section-title">🛒 구매한 과자</h2>
+              {snackLoading && <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />}
+            </div>
+
+            {snacks.length === 0 && !snackLoading ? (
+              <div className="empty-state">
+                <span className="empty-icon">🍬</span>
+                <span>아직 구매한 과자가 없어요</span>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {snacks.map((snack) => (
+                  <BoughtSnackCard key={snack.구매_id} snack={snack} />
+                ))}
+              </div>
+            )}
+            <Pagination page={snackPage} totalPages={snackTotalPages} onChange={setSnackPage} />
+          </section>
+
+          {/* 과자 추천 */}
+          <section>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <h2 className="section-title">🍬 과자 추천</h2>
+              {recLoading && <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />}
+            </div>
+
+            {recList.length === 0 && !recLoading ? (
+              <div className="empty-state">
+                <span className="empty-icon">🍫</span>
+                <span>아직 추천글이 없어요</span>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {recList.map((rec) => (
+                  <RecommendationCard
+                    key={rec.주문_id}
+                    rec={rec}
+                    onDeleted={handleRecDeleted}
+                  />
+                ))}
+              </div>
+            )}
+            <Pagination page={recPage} totalPages={recTotalPages} onChange={setRecPage} />
+          </section>
         </div>
       </main>
+
+      <Footer />
     </div>
+  );
+}
+
+function Footer() {
+  return (
+    <footer
+      style={{
+        marginTop: 48,
+        padding: "20px 24px",
+        borderTop: "1.5px solid var(--border-color)",
+        textAlign: "center",
+        color: "var(--text-muted)",
+        fontSize: "0.82rem",
+        fontWeight: 600,
+      }}
+    >
+      🍪 두과자 — 과자 취향을 나눠요
+    </footer>
   );
 }
